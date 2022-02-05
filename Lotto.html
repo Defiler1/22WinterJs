@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="kor">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로또</title>
+    <style>
+      .ball {
+        display: inline-block;
+        border: 1px solid black;
+        border-radius: 20px;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 20px;
+        text-align: center;
+        margin-right: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <idv id="result">추첨 결과: </idv>
+    <div id="bonus">보너스:</div>
+
+    <script>
+      const $result = document.querySelector("#result");
+      const $bonus = document.querySelector("#bonus");
+      // Array(45) - 크기45의 빈 배열 선언
+      // Array(45).fill() - undefined로 초기화
+      // Array(45).fill().map(콜백함수명)
+      // const 콜백함수명 = (element, index) => {return element * 2}
+      const candidates = Array(45)
+        .fill()
+        .map(
+          // (e, i) => {return i + 1}
+          (e, i) => i + 1
+        );
+      // console.log(candidates)
+
+      const shuffles = [];
+      while (candidates.length > 0) {
+        const randIdx = Math.floor(Math.random() * candidates.length);
+        const selectedValue = candidates.splice(randIdx, 1);
+        // console.log(typeof selectedValue);
+        const inputVal = selectedValue[0];
+        shuffles.push(selectedValue);
+      }
+      console.log(shuffles);
+      // 배열명.sort(콜백함수명)
+      // const 콜배함수명 = (a,b) => {return a - b}
+      // const 콜배함수명 = (a,b) => a - b
+      // a-b결과: 오름차순
+      // const 콜백함수명 = (a,b) => b - a
+      // b-a결과: 내림차순
+      const winBalls = shuffles.slice(0, 6).sort((a, b) => a - b);
+      const bonus = shuffles[6];
+      console.log(winBalls, bonus);
+
+      /*
+      setTimeout(
+         콜백함수명, 
+         밀리초단위의타임아웃시간
+         1초 === 1000밀리초
+      )
+      동기식 동작(Synchronous)
+         - 함수 호출시 함수가 종료되어야 다른 처리가 가능
+
+      비동기식 동작(Asynchronous)
+         - 함수호출 하면 호출즉시 종료
+         함수의 기능을 콜백처리
+         동시에 여러가지 처리가 가능
+      */
+
+      const drawBall = ($parent, value) => {
+        const $ball = document.createElement("div");
+        // <div></div>
+        $ball.className = "ball";
+        // <div class='ball'></div>
+        $ball.textContent = value;
+        // <div class='ball'>Winball[0]</div>
+        $parent.appendChild($ball);
+      };
+
+      // let
+      // 블록내에서 사용가능
+      // var
+      // 함수내에서 사용가능
+      for (let i = 0; i < winBalls.length; i++) {
+        setTimeout(() => {
+          drawBall($result, winBalls[i]);
+          //  const $ball = document.createElement("div");
+          //  // <div></div>
+          //  $ball.className = "ball";
+          //  // <div class='ball'></div>
+          //  $ball.textContent = winBalls[0];
+          //  // <div class='ball'>Winball[0]</div>
+          //  $result.appendChild($ball);
+          //  // <div id='result'><div class='ball'>Winball[0]</div></div>
+        }, 1000 * (i + 1));
+      }
+
+      setTimeout(() => {
+        drawBall($bonus, bonus);
+        //   const $ball = document.createElement("div");
+        //   // <div></div>
+        //   $ball.className = "ball";
+        //   // <div class='ball'></div>
+        //   $ball.textContent = bonus;
+        //   // <div class='ball'>Winball[0]</div>
+        //   $bonus.appendChild($ball);
+        //   // <div id='result'><div class='ball'>Winball[0]</div></div>
+      }, 1000 * 7);
+    </script>
+  </body>
+</html>

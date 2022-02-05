@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang = "kor">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>숫자야구</title>
+   <style>
+
+   </style>
+</head>
+<body>
+   <!-- form 태그 - 버튼을 클릭하면 폼태그내부의 입력값들 서버(action에 지정된 주소)로 전송 후 결과 요청 -> 응답, 화면 새로고침 -->
+   <form action = "" id="form">
+      <input type="text" id="input">
+      <button>확인</button>
+   </form>
+   <div id="logs"></div>
+   <script>
+      const $input = document.querySelector("#input")
+      const $form = document.querySelector("#form")
+      const $logs = document.querySelector("#logs")
+
+      // Math.random() - 0.0 ~ 0.9999.... < 1.0
+      // 0.0 * 9 <= Math.random() * 9 < 1.0 * 9
+      // (m,n) * Math.random() + n - n 부터 m까지 (m포함 안함) 
+      // parseInt(Math.random() * 9 + 1) - 1 ~ 9
+      // Math.floor(Math.random() * 9 + 1) ` 1 ~ 9
+      // Math.floor()   내림
+      // Math.ceil()    올림
+      // Math.round()   반올림
+      
+   </script>
+</body>
+</html>
