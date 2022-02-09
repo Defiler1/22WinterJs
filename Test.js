@@ -1,55 +1,19 @@
-const input = document.querySelector("#input");
-const check = document.querySelector("#check");
-const logs = document.querySelector("#logs");
+const { body } = document;
+// const body = document.body;
+const $table = document.createElement("table");
+const $result = document.createElement("div"); // 결과창
+const rows = [];
 
-let numbers = [];
-for (let n = 0; n <= 9; n += 1) {
-  numbers.push(n);
-}
-let answer = [];
-
-for (let n = 0; n <= 3; n += 1) {
-  const index = Math.floor(Math.random() * numbers.length); // 0 ~ 9 정수
-  answer.push(numbers[index]);
-  numbers.splice(index, 1);
-}
-console.log(answer);
-// '3046',   '4316'
-
-let count = 0;
-check.addEventListener("click", () => {
-  const value = input.value; // 문자열 ex) '3046' true    truthy
-  // 0, '', NaN, false, null, undefined  -> falsy value
-  if (value && value.length === 4) {
-    // 앰퍼센드 AND 연산자 / 보호연산자
-    if (answer.join("") === value) {
-      logs.textContent = "HR";
-    } else {
-      console.log("다르다");
-      let strike = 0;
-      let ball = 0;
-      for (const [aIndex, aNumber] of answer.entries()) {
-        for (const [iIndex, iString] of input.value.split("").entries()) {
-          if (aNumber === Number(iString)) {
-            if (aIndex === iIndex) {
-              strike += 1;
-            } else {
-              ball += 1;
-            }
-          }
-        }
-      }
-      logs.append(
-        `${input.value}: ${strike} strike ${ball} ball`,
-        document.createElement("br")
-      );
-      if (count > 10) {
-        logs.appendChild(
-          document.createTextNode(`Game Over: ${answer.join("")}`)
-        );
-      } else {
-        count += 1;
-      }
-    }
+for (let i = 1; i <= 5; i++) {
+  const $tr = document.createElement("tr"); // 행
+  const cells = [];
+  for (let j = 1; j <= 4; j++) {
+    const $td = document.createElement("td");
+    cells.push($td); // 열
+    $tr.appendChild($td);
   }
-});
+  rows.push(cells);
+  $table.appendChild($tr);
+}
+body.appendChild($table);
+body.appendChild($result);
