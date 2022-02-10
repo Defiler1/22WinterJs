@@ -62,19 +62,6 @@ const callback = (event) => {
     return;
   }
   // 승자가 없으면
-  // let draw = true;
-  // rows.forEach((row) => {
-  //   row.forEach((cell) => {
-  //     if (!cell.textContent) {
-  //       draw = false;
-  //     }
-  //   });
-  // });
-  const draw = rows.flat().every((cell) => cell.textContent);
-  if (draw) {
-    $result.textContent = "무승부";
-    return;
-  }
   turn = turn === "X" ? "O" : "X";
 };
 
