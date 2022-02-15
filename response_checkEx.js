@@ -1,60 +1,46 @@
 const $screen = document.querySelector("#screen");
 const $result = document.querySelector("#result");
-const $trys = document.querySelector("#trys");
-// const $avg = document.querySelector("#avg");
+const $span = document.querySelector("#adsf");
 
 let startTime;
 let endTime;
 const records = [];
-let timeOut;
-const trys = [];
-
-// contains('클래스') - 해당클래스가 들어있으면 true 아니면 false
+let timeoutId;
 
 $screen.addEventListener("click", function () {
   if ($screen.classList.contains("waiting")) {
-    // 대기화면
-    $screen.classList.remove("waiting");
-    $screen.classList.add("ready");
-    $screen.textContent = "초록색이 되면 클릭하세요";
-    timeOut = setTimeout(() => {
+    // $screen에 waiting이란 클래스가 있으면 true 없으면 false
+    // $screen.classList.remove("waiting");
+    // $screen.classList.add("ready");
+    $screen.classList.replace("waiting", "ready");
+    $screen.textContent = "초록색이 되면 클릭하세요.";
+    timeoutId = setTimeout(() => {
       startTime = new Date();
-      $screen.classList.remove("ready");
-      $screen.classList.add("now");
+      $screen.classList.replace("ready", "now");
       $screen.textContent = "클릭하세요!";
-    }, Math.floor(Math.random() * 1000) + 2000); // 2 ~ 3초
+    }, Math.floor(Math.random() * 1000) + 2000); // 2~3초
   } else if ($screen.classList.contains("ready")) {
-    // 준비화면
-    clearTimeout(timeOut);
-    $screen.classList.remove("ready");
-    $screen.classList.add("waiting");
-    $screen.textContent = "너무 성급하시군요!";
+    clearTimeout(timeoutId);
+    $screen.classList.replace("ready", "waiting");
+    $screen.prepend(`너무 성급하시군요!`, document.createElement("br"));
+    // prepend() - 선택한 요소 내부의 시작 부분에 삽입
+    // append() - 선택한 요소 내부의 끝 부분에 삽입
   } else if ($screen.classList.contains("now")) {
-    // 클릭화면
     endTime = new Date();
-    const gap = endTime - startTime;
-    if (trys.length < 5) {
-      trys.push(gap);
-    }
-    records.push(gap); // 배열 요소 추가
-    const average = records.reduce((a, c) => a + c) / records.length;
-    //  배열.reduce((누적값, 현잿값) => {
-    //     return 새로운 누적값
-    //  }, 초기값)
-    // 배열의 모든 요소 합 구하기
-    $result.textContent = `현재: ${gap}ms 평균: ${average}`;
-    $trys.textContent = `결과: ${trys}`;
-    const topFive = records.sort((p, c) => p - c).slice(0, 5);
-    //  topFive.forEach((top, index) => {
-    //    $result.append(document.createElement("br"), `${index + 1}위: ${top}ms`);
-    //  });
-
-    //  //  $result.append(document.createElement('br')) -> html에 있는 id가 result 인 div태그 내에 br태그 넣어줌
-
+    const timeGap = endTime - startTime;
+    records.push(timeGap);
+    const avg = records.reduce((a, c) => a + c) / records.length;
+    // 배열.reduce((누적값, 현잿값) => {return 새로운 누적값}, 초깃값)
+    // 배열의 값들을 하나의 새로운 값으로 합치는 메서드
+    // 초기값이 없으면 배열의 첫 번째 요소가 초기값
+    // 초기값 -> 누적값
+    // 마지막으로 반환되는 값이 결과값
+    $result.textContent = `현재: ${timeGap.toFixed(1)}ms, 평균: ${avg.toFixed(
+      1
+    )}ms`;
     startTime = null;
     endTime = null;
-    $screen.classList.remove("now");
-    $screen.classList.add("waiting");
+    $screen.classList.replace("now", "waiting");
     $screen.textContent = "클릭해서 시작하세요.";
   }
 });
