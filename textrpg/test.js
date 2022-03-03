@@ -11,3 +11,11 @@ const C = c.slice();
 const E = { ...e };
 const I = JSON.parse(JSON.stringify(i));
 const N = JSON.parse(JSON.stringify(n));
+
+document.addEventListener("click", function () {
+  console.log(this); // document
+});
+
+document.addEventListener("click", () => {
+  console.log(this); // window
+});

@@ -6,7 +6,7 @@ const $heroLevel = document.querySelector("#hero-level");
 const $heroHp = document.querySelector("#hero-hp");
 const $heroXp = document.querySelector("#hero-xp");
 const $heroAtt = document.querySelector("#hero-att");
-const $monsterNmae = document.querySelector("#monster-name");
+const $monsterName = document.querySelector("#monster-name");
 const $monsterHp = document.querySelector("#monster-hp");
 const $monsterAtt = document.querySelector("#monster-att");
 const $message = document.querySelector("#message");
@@ -16,27 +16,13 @@ class Game {
     this.monster = null;
     this.hero = null;
     this.monsterList = [
-      {
-        name: "슬라임",
-        hp: 25,
-        att: 10,
-        xp: 10,
-      },
-      {
-        name: "스켈레톤",
-        hp: 50,
-        att: 15,
-        xp: 20,
-      },
-      {
-        name: "마왕",
-        hp: 150,
-        att: 35,
-        xp: 50,
-      },
+      { name: "슬라임", hp: 25, att: 10, xp: 10 },
+      { name: "스켈레톤", hp: 50, att: 15, xp: 20 },
+      { name: "마왕", hp: 150, att: 35, xp: 50 },
     ];
     this.start(name);
   }
+
   start(name) {
     $gameMenu.addEventListener("submit", this.onGameMenuInput);
     $battleMenu.addEventListener("submit", this.onBattleMenuInput);
@@ -60,10 +46,13 @@ class Game {
       $battleMenu.style.display = "block";
     }
   }
+
   onGameMenuInput = (event) => {
+    // function()을 사용할 시 this는 $gameMenu가 된다.
     event.preventDefault();
     const input = event.target["menu-input"].value;
     if (input === "1") {
+      // 모험
       this.changeScreen("battle");
       const randomIndex = Math.floor(Math.random() * this.monsterList.length);
       const randomMonster = this.monsterList[randomIndex];
@@ -75,119 +64,148 @@ class Game {
         randomMonster.xp
       );
       this.updateMonsterStat();
-      this.showMessage(`몬스터와 마주쳤다. ${this.monster.name}인 것 같다!`);
+      this.showMessage(`몬스터와 마주쳤다. ${this.monster.name}인 것 같다.`);
+      this.changeScreen("battle");
     } else if (input === "2") {
+      // 휴식
     } else if (input === "3") {
+      // 종료
     }
   };
+
   onBattleMenuInput = (event) => {
+    // function()을 사용할 시 this는 $battleMenu가 된다.
     event.preventDefault();
     const input = event.target["battle-input"].value;
     if (input === "1") {
+      // 공격
+      const { hero, monster } = this;
+      hero.attack(monster);
+      monster.attack(hero);
+      if (hero.hp <= 0) {
+        this.showMessage(`${hero.lev} 레벨에서 전사. 새 주인공을 생성하세요.`);
+        this.quit();
+      } else if (monster.hp <= 0) {
+        this.showMessage(`몬스터를 잡아 ${monster.xp} 경험치를 얻었다.`);
+        hero.getXp(monster.xp);
+        this.monster = null;
+        this.changeScreen("game");
+      } else {
+        // 전투 진행중
+        this.showMessage(
+          `${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`
+        );
+      }
+      this.updateHeroStat();
+      this.updateMonsterStat();
     } else if (input === "2") {
+      // 회복
     } else if (input === "3") {
+      // 도망
     }
   };
+
   updateHeroStat() {
     const { hero } = this;
     if (hero === null) {
+      // 주인공이 죽었을 때
       $heroName.textContent = "";
       $heroLevel.textContent = "";
       $heroHp.textContent = "";
-      $heroXp.textContent = "";
+      $heroXp = "";
       $heroAtt.textContent = "";
       return;
     }
     $heroName.textContent = hero.name;
-    $heroLevel.textContent = `${hero.lev}Lev`;
+    $heroLevel.textContent = `${hero.lev}Lv`;
     $heroHp.textContent = `HP: ${hero.hp}/${hero.maxHp}`;
     $heroXp.textContent = `XP: ${hero.xp}/${15 * hero.lev}`;
-    $heroAtt.textContent = `ATT: ${hero.att}`;
+    $heroAtt.textContent = `Att: ${hero.att}`;
   }
+
   updateMonsterStat() {
     const { monster } = this;
     if (monster === null) {
-      $monsterNmae.textContent = "";
+      $monsterName.textContent = "";
       $monsterHp.textContent = "";
       $monsterAtt.textContent = "";
       return;
     }
-    $monsterNmae.textContent = monster.name;
+    $monsterName.textContent = monster.name;
     $monsterHp.textContent = `HP: ${monster.hp}/${monster.maxHp}`;
-    $monsterAtt.textContent = `ATT: ${monster.att}`;
+    $monsterAtt.textContent = `Att: ${monster.att}`;
   }
+
   showMessage(text) {
     $message.textContent = text;
   }
+
+  quit() {
+    this.hero = null;
+    this.monster = null;
+    this.updateHeroStat();
+    this.updateMonsterStat();
+    $gameMenu.removeEventListener("submit", this.onGameMenuInput);
+    $battleMenu.removeEventListener("submit", this.onBattleMenuInput);
+    this.changeScreen("start");
+    game = null;
+  }
 }
 
-class Hero {
-  constructor(game, name) {
+class Unit {
+  constructor(game, name, hp, att, xp) {
     this.game = game;
     this.name = name;
-    this.lev = 1;
-    this.maxHp = 100;
-    this.hp = 100;
-    this.xp = 0;
-    this.att = 0;
+    this.maxHp = hp;
+    this.hp = hp;
+    this.xp = xp;
+    this.att = att;
   }
+
   attack(target) {
     target.hp -= this.att;
+  }
+}
+
+class Hero extends Unit {
+  constructor(game, name) {
+    super(game, name, 100, 10, 0);
+    this.lev = 1;
+  }
+
+  attack(target) {
+    super.attack(target);
   }
 
   heal(monster) {
     this.hp += 20;
     this.hp -= monster.att;
   }
+
+  getXp(xp) {
+    this.xp += xp;
+    if (this.xp >= this.lev * 15) {
+      this.xp -= this.lev * 15;
+      this.lev += 1;
+
+      this.maxHp += 5;
+      this.att += 5;
+      this.hp = this.maxHp;
+      this.game.showMessage(`레벨업! 레벨 ${this.lev}`);
+    }
+  }
+}
+
+class Monster extends Unit {
+  constructor(game, name, hp, att, xp) {
+    super(game, name, hp, att, xp);
+  }
 }
 
 let game = null;
 
 $startScreen.addEventListener("submit", (event) => {
-  // submit을 하면 화면 새로고침이 되는데 preventDefault를 사용해 새로고침 막음
   event.preventDefault();
-  const name = event.target["name-input"].value; // input에 입력한 값
+  const name = event.target["name-input"].value;
   game = new Game(name);
-  // $startScreen.style.display = "none";
-  // $gameMenu.style.display = "block";
-  // $heroName.textContent = name;
-  // $heroLevel.textContent = `${hero.lev}Lev`;
-  // $heroHp.textContent = `HP: ${hero.hp}/${hero.maxHp}`;
-  // $heroXp.textContent = `XP: ${hero.xp}/${15 * hero.lev}`;
-  // $heroAtt.textContent = `ATT: ${hero.att}`;
-  // hero.name = name;
 });
-
-// $gameMenu.addEventListener("submit", (event) => {
-//   event.preventDefault();
-//   const input = event.target["menu-input"].value;
-//   if (input === "1") {
-//     $gameMenu.style.display = "none";
-//     $battleMenu.style.display = "block";
-//     monster = JSON.parse(
-//       // parse - 문자열을 객체로
-//       JSON.stringify(
-//         // stringify - 객체를 문자열로
-//         // parse + stringify메서드를 조합해서 사용하면 대상 객체를 깊은복사(deep copy) 할 수 있다.
-//         monsterList[Math.floor(Math.random() * monsterList.length)]
-//       )
-//     );
-//     monster.maxHp = monster.hp;
-//     $monsterNmae.textContent = monster.name;
-//     $monsterHp.textContent = `HP: ${monster.hp}/${monster.maxHp}`;
-//     $monsterAtt.textContent = `ATT: ${monster.att}`;
-//     $message.textContent = `${hero.att}의 데미지를 주고, ${monster.att}의 데미지를 받았다.`;
-//   } else if (input === "2") {
-//   } else if (input === "3") {
-//   }
-//   const monster1 = JSON.parse(JSON.stringify(monsterList[0]));
-//   // monster1에 monsterList[0]의 객체를 복사한 것
-//   const monster2 = monsterList[0];
-//   monster1.name = "새 몬스터";
-//   console.log(monster1.name); // 새 몬스터
-//   console.log(monsterList[0].name); // 슬라임
-//   monster2.name = "새 몬스터";
-//   console.log(monsterList[0].name); // 새 몬스터
-//   console.log(monsterList[0] === monster1); // false 깊은 복사
-//   console.log(monsterList[0] === monster2); // true 참조관계
-// });
